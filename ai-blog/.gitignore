@@ -1,1 +1,4 @@
 .worktrees/
+hexo/node_modules/
+hexo/db.json
+hexo/public/
