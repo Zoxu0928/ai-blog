@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,6 +30,7 @@ jobs:
 
       - name: Build
         run: |
+          set -e
           cd hexo
           hexo clean
           hexo generate
@@ -41,7 +43,15 @@ jobs:
           TARGET: ${{ secrets.DEPLOY_TARGET }}
         run: |
           eval "$(ssh-agent -s)"
-          echo "$KEY" | tr -d '\r' | ssh-add -
+
+          # Write key to file with restricted permissions
+          KEY_FILE=$(mktemp)
+          echo "$KEY" | tr -d '\r' > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+
+          ssh-add "$KEY_FILE"
+          rm "$KEY_FILE"
+
           mkdir -p ~/.ssh
           ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
 
