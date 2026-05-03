@@ -1,0 +1,42 @@
+# 菜单
+menu:
+  Home: / || fa-solid fa-home
+  Archives: /archives || fa-solid fa-archive
+  Tags: /tags || fa-solid fa-tags
+  About: /about || fa-solid fa-user
+
+# 侧边排版
+sidebar:
+  enable: true
+  position: left
+  touchStart: 200
+
+# 头像
+avatar:
+  url: /img/avatar.jpg
+  effect: true
+
+# 社交信息
+social:
+  GitHub: https://github.com/yourname || fa-brands fa-github
+  Twitter: https://twitter.com/yourname || fa-brands fa-twitter
+
+# 主页排版
+index_page:
+  top_grouping: all
+  top: true
+
+# 文章页配置
+article:
+  highlight:
+    enable: true
+    line_number: true
+  copy:
+    enable: true
+
+# 评论
+comments:
+  enable: true
+  type: waline
+  waline:
+    serverURL: https://your-waline-server.com
