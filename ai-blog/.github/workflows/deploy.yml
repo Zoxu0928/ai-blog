@@ -1,0 +1,55 @@
+name: Deploy Blog
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          recursive: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: hexo/package-lock.json
+
+      - name: Install Dependencies
+        run: |
+          cd hexo
+          npm install
+
+      - name: Build
+        run: |
+          cd hexo
+          hexo clean
+          hexo generate
+
+      - name: Deploy to Server
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+          KEY: ${{ secrets.DEPLOY_KEY }}
+          TARGET: ${{ secrets.DEPLOY_TARGET }}
+        run: |
+          eval "$(ssh-agent -s)"
+          echo "$KEY" | tr -d '\r' | ssh-add -
+          mkdir -p ~/.ssh
+          ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
+
+          rsync -avz --delete \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            ./hexo/public/ \
+            $USER@$HOST:$TARGET
+
+      - name: Cleanup SSH agent
+        run: |
+          ssh-agent -k
